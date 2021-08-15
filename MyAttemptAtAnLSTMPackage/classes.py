@@ -7,10 +7,35 @@ class Network():
         self.layers = []
         self.connections = []
         self.weights = []
+        self.values = []
 
-        
+    def run(self, dict=[]):
+        if len(dict) !=  self.layers[0]:
+            raise Exception("Incorrect Shape of Input")
+        else:
+            self.vales[0] = dict
+
+    def feed_forward(self):
+        current_layer = self.values.index([])
+        previous_values = self.values[current_layer - 1]
+        weights = self.weights[current_layer - 1]
+        number_of_neurons_pre_layer = len(previous_values)
+
+        values = []
+        temp_list = []
+
+        for neuron in range(self.layers[current_layer]):
+            index_position = neuron * number_of_neurons_pre_layer
+            temp_weights = weight[index_position: index_position + number_of_neurons_pre_layer]
+            for value, weight in zip(previous_values, temp_weights):
+                temp_list.append(value * weight)
+
+        self.values[current_layer] = temp_list
+
+
     def add_layer(self, neurons=5):
         self.layers.append(neurons)
+        self.values.append([])
 
     def initialize_weights(self):
         layer_list_first_excluded = list(self.layers)
@@ -19,8 +44,22 @@ class Network():
             self.connections.append(previous_layer * layer)
             previous_layer = layer
 
-        for i in range(sum(self.connections)):
-            self.weights.append(random.random())
+        for connections in self.connections:
+            temp_list = []
+            for i in range(connections):
+                temp_list.append(random.random())
+            self.weights.append(temp_list)
+
+    def stats(self):
+        print("Layers :")
+        print(self.layers)
+        print("Connections :")
+        print(self.connections)
+        print("Weights :")
+        print(self.weights)
+        print("Values :")
+        print(self.values)
+
 
 Network = Network()
 
@@ -29,3 +68,5 @@ Network.add_layer(4)
 Network.add_layer(2)
 
 Network.initialize_weights()
+
+#Network.stats()

@@ -1,5 +1,6 @@
-import pandas as pd
+
 import random
+from math import exp
 
 class Network():
 
@@ -13,7 +14,12 @@ class Network():
         if len(dict) !=  self.layers[0]:
             raise Exception("Incorrect Shape of Input")
         else:
-            self.vales[0] = dict
+            self.values[0] = dict
+
+    def activation_func(self, func_name = "", value = 0):
+        if (func_name == "Sigmoid"):
+           return(1 / 1 - exp(-value))
+
 
     def feed_forward(self):
         current_layer = self.values.index([])
@@ -22,15 +28,15 @@ class Network():
         number_of_neurons_pre_layer = len(previous_values)
 
         values = []
-        temp_list = []
 
         for neuron in range(self.layers[current_layer]):
+            temp_list = []
             index_position = neuron * number_of_neurons_pre_layer
-            temp_weights = weight[index_position: index_position + number_of_neurons_pre_layer]
+            temp_weights = weights[index_position: index_position + number_of_neurons_pre_layer]
             for value, weight in zip(previous_values, temp_weights):
                 temp_list.append(value * weight)
-
-        self.values[current_layer] = temp_list
+            values.append(Network.activation_func("Sigmoid", sum(temp_list)))
+        self.values[current_layer] = values
 
 
     def add_layer(self, neurons=5):
@@ -68,5 +74,10 @@ Network.add_layer(4)
 Network.add_layer(2)
 
 Network.initialize_weights()
+Network.run(dict=[0,1,0,1,0,1,0,0])
+Network.feed_forward()
+Network.feed_forward()
+Network.stats()
 
-#Network.stats()
+
+print(Network.activation_func("Sigmoid", 0))

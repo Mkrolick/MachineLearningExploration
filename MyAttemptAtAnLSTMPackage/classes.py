@@ -59,7 +59,7 @@ class Network():
             self.weights.append(temp_list)
 
 
-    def train(self, inputs):
+    def train(self, inputs, labels):
         for input in inputs:
             # creates a list in [[],[],[]] format for self.values
             for node in range(self.nodes):
@@ -72,6 +72,23 @@ class Network():
                 i -= 1
             self.values_list.append(self.values)
             self.values = []
+
+    def predict(self, inputs):
+        temp_list = []
+        for input in inputs:
+            # creates a list in [[],[],[]] format for self.values
+            for node in range(self.nodes):
+                self.values.append([])
+
+            Network.run(dict=input)
+            i = self.nodes - 1
+            while i > 0:
+                Network.feed_forward()
+                i -= 1
+            temp_list.append(self.values)
+            self.values = []
+        print(temp_list)
+
 
     def stats(self):
         print("Layers :")
@@ -94,7 +111,10 @@ Network.initialize_weights()
 #Network.run(dict=[0,1,0,1,0,1,0,0])
 #Network.feed_forward()
 #Network.feed_forward()
-Network.train(inputs = [[0,1,0,1,0,1,0,0]])
+inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
+
+
+Network.train(inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]], labels=[])
 
 Network.stats()
 

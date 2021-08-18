@@ -9,6 +9,8 @@ class Network():
         self.connections = []
         self.weights = []
         self.values = []
+        self.values_list = []
+        self.nodes = 0
 
     def run(self, dict=[]):
         if len(dict) !=  self.layers[0]:
@@ -41,7 +43,7 @@ class Network():
 
     def add_layer(self, neurons=5):
         self.layers.append(neurons)
-        self.values.append([])
+        self.nodes += 1
 
     def initialize_weights(self):
         layer_list_first_excluded = list(self.layers)
@@ -56,6 +58,21 @@ class Network():
                 temp_list.append(random.random())
             self.weights.append(temp_list)
 
+
+    def train(self, inputs):
+        for input in inputs:
+            # creates a list in [[],[],[]] format for self.values
+            for node in range(self.nodes):
+                self.values.append([])
+
+            Network.run(dict=input)
+            i = self.nodes - 1
+            while i > 0:
+                Network.feed_forward()
+                i -= 1
+            self.values_list.append(self.values)
+            self.values = []
+
     def stats(self):
         print("Layers :")
         print(self.layers)
@@ -64,7 +81,7 @@ class Network():
         print("Weights :")
         print(self.weights)
         print("Values :")
-        print(self.values)
+        print(self.values_list)
 
 
 Network = Network()
@@ -74,10 +91,12 @@ Network.add_layer(4)
 Network.add_layer(2)
 
 Network.initialize_weights()
-Network.run(dict=[0,1,0,1,0,1,0,0])
-Network.feed_forward()
-Network.feed_forward()
+#Network.run(dict=[0,1,0,1,0,1,0,0])
+#Network.feed_forward()
+#Network.feed_forward()
+Network.train(inputs = [[0,1,0,1,0,1,0,0]])
+
 Network.stats()
 
 
-print(Network.activation_func("Sigmoid", 0))
+#print(Network.activation_func("Sigmoid", 0))

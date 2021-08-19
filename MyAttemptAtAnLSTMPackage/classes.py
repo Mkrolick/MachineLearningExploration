@@ -119,7 +119,6 @@ class Network():
             temp_list_errors_storage.append(temp_list_errors)
             temp_list_errors = []
         self.error_signal_list.append(temp_list_errors_storage)
-
         return [sum(x) for x in zip(*temp_list)]
 
     def generate_error_signal_hidden(self, current_layer = 0):
@@ -137,10 +136,10 @@ class Network():
             error_list = []
 
         list_error_incl_sample = [[sum(x) for x in zip(*sample)] for sample in list_error_incl_sample]
+        self.error_signal_list.reverse()
         self.error_signal_list.append(list_error_incl_sample)
-        print(self.error_signal_list[0])
-        self.error_signal_list = self.error_signal_list.reverse()
-        print(list_error_incl_sample)
+        self.error_signal_list.reverse()
+        return list_error_incl_sample
 
 
 

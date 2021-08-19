@@ -11,6 +11,7 @@ class Network():
         self.values = []
         self.values_list = []
         self.nodes = 0
+        self.learning_rate = 0.1
 
     def run(self, dict=[]):
         if len(dict) !=  self.layers[0]:
@@ -90,6 +91,25 @@ class Network():
         print(temp_list)
 
 
+    def generate_error_signal(self, label, estimated_output):
+        return (label - estimated_output) * estimated_output * (1 - estimated_output)
+
+    def backprop(self, labels):
+        layers = self.layers
+        values_output = [value[len(layers) - 1] for value in self.values_list]
+        output_of_previous_neurons = self.values_list
+        #[0][len(layers) - 2]
+        temp_list = []
+        temp_list2 = []
+
+        for value_chunk, label_chunk, previous_neurons in zip(values_output, labels, output_of_previous_neurons):
+            for value, label in zip(value_chunk, label_chunk):
+                for neuron in previous_neurons[len(layers) - 2]:
+                    temp_list2.append(self.learning_rate * self.generate_error_signal(label, value) * neuron)
+            temp_list.append(temp_list2)
+            temp_list2 = []
+        return [sum(x) for x in zip(*temp_list)]
+
     def stats(self):
         print("Layers :")
         print(self.layers)
@@ -114,9 +134,9 @@ Network.initialize_weights()
 inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
 
 
-Network.train(inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]], labels=[])
+Network.train(inputs = [[0,0,0,0,1,1,1,1], [0,1,0,1,0,1,1,1]], labels=[])
 
-Network.stats()
-
+#Network.stats()
+print(Network.backprop([[0,1], [0,1]]))
 
 #print(Network.activation_func("Sigmoid", 0))

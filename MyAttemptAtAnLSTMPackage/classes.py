@@ -12,7 +12,7 @@ class Network():
         self.values_list = []
         self.nodes = 0
         self.learning_rate = 0.1
-
+        self.error_signal_list = []
     def run(self, dict=[]):
         if len(dict) !=  self.layers[0]:
             raise Exception("Incorrect Shape of Input")
@@ -91,8 +91,11 @@ class Network():
         print(temp_list)
 
 
-    def generate_error_signal(self, label, estimated_output):
+    def generate_error_signal_output(self, label, estimated_output):
         return (label - estimated_output) * estimated_output * (1 - estimated_output)
+
+
+
 
     def backprop(self, labels):
         layers = self.layers
@@ -101,14 +104,48 @@ class Network():
         #[0][len(layers) - 2]
         temp_list = []
         temp_list2 = []
-
+        temp_list_errors = []
+        temp_list_errors_storage  = []
         for value_chunk, label_chunk, previous_neurons in zip(values_output, labels, output_of_previous_neurons):
             for value, label in zip(value_chunk, label_chunk):
+
+                error_signal = self.generate_error_signal_output(label, value)
+                temp_list_errors.append(error_signal)
+
                 for neuron in previous_neurons[len(layers) - 2]:
-                    temp_list2.append(self.learning_rate * self.generate_error_signal(label, value) * neuron)
+                    temp_list2.append(self.learning_rate * error_signal * neuron)
             temp_list.append(temp_list2)
             temp_list2 = []
+            temp_list_errors_storage.append(temp_list_errors)
+            temp_list_errors = []
+        self.error_signal_list.append(temp_list_errors_storage)
+
         return [sum(x) for x in zip(*temp_list)]
+
+    def generate_error_signal_hidden(self, current_layer = 0):
+        preceding_error_list = self.error_signal_list[0]
+        single_error_list = []
+        error_list = []
+        list_error_incl_sample = []
+        for value, error_signal in zip(self.values_list, preceding_error_list):
+            for error in error_signal:
+                for state, weight in zip(value[-2 - current_layer], self.weights[- 1 -current_layer]):
+                    single_error_list.append(error * weight * state * (1- state))
+                error_list.append(single_error_list)
+                single_error_list = []
+            list_error_incl_sample.append(error_list)
+            error_list = []
+
+        list_error_incl_sample = [[sum(x) for x in zip(*sample)] for sample in list_error_incl_sample]
+        self.error_signal_list.append(list_error_incl_sample)
+        print(self.error_signal_list[0])
+        self.error_signal_list = self.error_signal_list.reverse()
+        print(list_error_incl_sample)
+
+
+
+
+
 
     def stats(self):
         print("Layers :")
@@ -137,6 +174,8 @@ inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
 Network.train(inputs = [[0,0,0,0,1,1,1,1], [0,1,0,1,0,1,1,1]], labels=[])
 
 #Network.stats()
-print(Network.backprop([[0,1], [0,1]]))
+Network.backprop([[0,1], [0,1]])
 
 #print(Network.activation_func("Sigmoid", 0))
+Network.generate_error_signal_hidden()
+Network.generate_error_signal_hidden(current_layer=1)

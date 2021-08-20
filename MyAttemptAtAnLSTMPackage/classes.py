@@ -142,16 +142,26 @@ class Network():
         return list_error_incl_sample
 
 
-    def gererate_prop_hidden_layer(self, current_layer = 0):
-        error_signal_list = self.error_signal_list()
-        hidden_neuron_list = []
+    def backprop_hidden_layer(self, current_layer = 0):
+        error_signal_list = self.error_signal_list[0]
+        hidden_neuron_list = self.values_list
+        sample_list = []
         temp_list = []
-        for sample in error_signal_list:
+        individual_error_signal_list = []
+
+        for sample, neuron_values in zip(error_signal_list, hidden_neuron_list):
             for error_signal in sample:
-                for neuron_value in hidden_neuron_list:
+
+                for neuron_value in neuron_values[-3 - current_layer]:
                     # learning rate * error_signal of hidden layer * value of hidden layer neuron
                     temp_list.append(self.learning_rate * error_signal * neuron_value)
-        return temp_list
+                individual_error_signal_list.append(temp_list)
+                temp_list = []
+            sample_list.append(individual_error_signal_list)
+            individual_error = []
+
+        #print(len(self.error_signal_list[0][0]))
+        return sample_list
 
 
 
@@ -186,4 +196,4 @@ Network.backprop([[0,1], [0,1]])
 
 #print(Network.activation_func("Sigmoid", 0))
 Network.generate_error_signal_hidden()
-Network.generate_error_signal_hidden(current_layer=1)
+print(Network.backprop_hidden_layer())

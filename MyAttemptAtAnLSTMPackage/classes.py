@@ -142,7 +142,16 @@ class Network():
         return list_error_incl_sample
 
 
-
+    def gererate_prop_hidden_layer(self, current_layer = 0):
+        error_signal_list = self.error_signal_list()
+        hidden_neuron_list = []
+        temp_list = []
+        for sample in error_signal_list:
+            for error_signal in sample:
+                for neuron_value in hidden_neuron_list:
+                    # learning rate * error_signal of hidden layer * value of hidden layer neuron
+                    temp_list.append(self.learning_rate * error_signal * neuron_value)
+        return temp_list
 
 
 

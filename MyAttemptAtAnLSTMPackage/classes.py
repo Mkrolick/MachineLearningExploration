@@ -13,6 +13,7 @@ class Network():
         self.nodes = 0
         self.learning_rate = 0.1
         self.error_signal_list = []
+
     def run(self, dict=[]):
         if len(dict) !=  self.layers[0]:
             raise Exception("Incorrect Shape of Input")
@@ -151,14 +152,14 @@ class Network():
 
         for sample, neuron_values in zip(error_signal_list, hidden_neuron_list):
             for error_signal in sample:
-
                 for neuron_value in neuron_values[-3 - current_layer]:
+
                     # learning rate * error_signal of hidden layer * value of hidden layer neuron
                     temp_list.append(self.learning_rate * error_signal * neuron_value)
                 individual_error_signal_list.append(temp_list)
                 temp_list = []
             sample_list.append(individual_error_signal_list)
-            individual_error = []
+            individual_error_signal_list = []
 
         #print(len(self.error_signal_list[0][0]))
         return sample_list
@@ -180,6 +181,7 @@ Network = Network()
 
 Network.add_layer(8)
 Network.add_layer(4)
+Network.add_layer(3)
 Network.add_layer(2)
 
 Network.initialize_weights()
@@ -196,5 +198,9 @@ Network.backprop([[0,1], [0,1]])
 
 #print(Network.activation_func("Sigmoid", 0))
 Network.generate_error_signal_hidden()
-print(Network.backprop_hidden_layer())
-print(Network.error_signal_list[1])
+Network.backprop_hidden_layer()
+print(Network.generate_error_signal_hidden(current_layer=1))
+print(Network.backprop_hidden_layer(current_layer=1))
+#print(len(Network.backprop_hidden_layer(current_layer=1)[0]))
+#print(Network.error_signal_list[0])
+#print(Network.error_signal_list)

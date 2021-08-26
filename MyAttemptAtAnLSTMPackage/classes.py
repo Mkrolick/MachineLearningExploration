@@ -2,6 +2,10 @@
 import random
 from math import exp
 
+import numpy as np
+
+
+
 class Network():
 
     def __init__(self):
@@ -13,12 +17,15 @@ class Network():
         self.nodes = 0
         self.learning_rate = 0.1
         self.error_signal_list = []
+        self.temp_weight_changes = []
+
 
     def run(self, dict=[]):
         if len(dict) !=  self.layers[0]:
             raise Exception("Incorrect Shape of Input")
         else:
             self.values[0] = dict
+
 
     def activation_func(self, func_name = "", value = 0):
         if (func_name == "Sigmoid"):
@@ -47,12 +54,14 @@ class Network():
         self.layers.append(neurons)
         self.nodes += 1
 
+
     def initialize_weights(self):
         layer_list_first_excluded = list(self.layers)
         previous_layer = layer_list_first_excluded.pop(0)
         for layer in layer_list_first_excluded:
             self.connections.append(previous_layer * layer)
             previous_layer = layer
+
 
         for connections in self.connections:
             temp_list = []
@@ -61,7 +70,7 @@ class Network():
             self.weights.append(temp_list)
 
 
-    def train(self, inputs, labels):
+    def generate_values(self, inputs):
         for input in inputs:
             # creates a list in [[],[],[]] format for self.values
             for node in range(self.nodes):
@@ -98,7 +107,7 @@ class Network():
 
 
 
-    def backprop(self, labels):
+    def backprop_output(self, labels):
         layers = self.layers
         values_output = [value[len(layers) - 1] for value in self.values_list]
         output_of_previous_neurons = self.values_list
@@ -145,24 +154,35 @@ class Network():
 
     def backprop_hidden_layer(self, current_layer = 0):
         error_signal_list = self.error_signal_list[0]
+        #error_signal_list = self.error_signal_list[0]
         hidden_neuron_list = self.values_list
+        # hidden_neuron_list = self.values_list[1 + current_layer]
         sample_list = []
         temp_list = []
         individual_error_signal_list = []
-
+        #print(self.error_signal_list)
         for sample, neuron_values in zip(error_signal_list, hidden_neuron_list):
             for error_signal in sample:
                 for neuron_value in neuron_values[-3 - current_layer]:
-
                     # learning rate * error_signal of hidden layer * value of hidden layer neuron
+
                     temp_list.append(self.learning_rate * error_signal * neuron_value)
                 individual_error_signal_list.append(temp_list)
                 temp_list = []
+
+            # Unsure Why different errors
+            #individual_error_signal_list =  [sum(x) for x in zip(*individual_error_signal_list)]
+
+
             sample_list.append(individual_error_signal_list)
             individual_error_signal_list = []
 
-        #print(len(self.error_signal_list[0][0]))
-        return sample_list
+        np_array = np.array(sample_list)
+        length_array = len(np_array[0])
+        summed_weights = [[sum(zipped_elements) for zipped_elements in zip(*np_array[:,second_dimension_index])] \
+                         for second_dimension_index in range(length_array)]
+        flattened_weight_changes = np.array(summed_weights).flatten()
+        return flattened_weight_changes.tolist()
 
 
 
@@ -176,6 +196,20 @@ class Network():
         print("Values :")
         print(self.values_list)
 
+    def run_epoch(self, inputs, labels, Network):
+        # Input in form [[1,1,0,1,0], [0,1,1,0,0], [0,1,1,1,0], ..., [0,1,1,1,0]]
+        # Need to match input Layer
+        Network.generate_values(inputs = inputs)
+        # Labels in form [[0,1], [1,0], ..., [0,1]]
+        # Match Output Layer
+        Network.backprop_output(labels = labels)
+
+        count_layers = Network.layers
+
+        for layer_index in range(count_layers - 2):
+            Network.generate_error_signal_hidden(current_layer=layer_index)
+            Network.backprop_hidden_layer(current_layer=layer_index)
+
 
 Network = Network()
 
@@ -183,24 +217,36 @@ Network.add_layer(8)
 Network.add_layer(4)
 Network.add_layer(3)
 Network.add_layer(2)
-
 Network.initialize_weights()
+
 #Network.run(dict=[0,1,0,1,0,1,0,0])
 #Network.feed_forward()
 #Network.feed_forward()
 inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
 
 
-Network.train(inputs = [[0,0,0,0,1,1,1,1], [0,1,0,1,0,1,1,1]], labels=[])
+Network.generate_values(inputs = [[0,0,0,0,1,1,1,1], [0,1,0,1,0,1,1,1]])
 
 #Network.stats()
-Network.backprop([[0,1], [0,1]])
+Network.backprop_output([[0,1], [0,1]])
 
 #print(Network.activation_func("Sigmoid", 0))
 Network.generate_error_signal_hidden()
-Network.backprop_hidden_layer()
-print(Network.generate_error_signal_hidden(current_layer=1))
-print(Network.backprop_hidden_layer(current_layer=1))
+#print(Network. values_list)
+temp_ = Network.backprop_hidden_layer()
+print(temp_)
+
+# 2 -> 3 -> 4
+
+
+#print(temp_[0][0], temp_[1][0])
+Network.generate_error_signal_hidden(current_layer=1)
+#print(len(Network.backprop_hidden_layer(current_layer=1)[0]))
 #print(len(Network.backprop_hidden_layer(current_layer=1)[0]))
 #print(Network.error_signal_list[0])
 #print(Network.error_signal_list)
+#print(Network.error_signal_list)
+#print(len(Network.error_signal_list))
+#print(len(Network.weights))
+
+print([len(x) for x in Network.weights])

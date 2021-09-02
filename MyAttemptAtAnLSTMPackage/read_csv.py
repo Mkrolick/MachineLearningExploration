@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from MyAttemptAtAnLSTMPackage.classes import Network
+from classesa import Network
 df = pd.read_csv("/Users/malcolmkrolick/Documents/GitHub/MachineLearningExploration/MyAttemptAtAnLSTMPackage/mnist_test.csv")
-print(df.info())
+
 #print(df.head())
 #print(df.loc[0])
 """
@@ -48,7 +48,38 @@ for label, values in zip(label_dataset, train_data):
     #Done in 3.379 seconds, 3.406, 3.2
     # avg = 3.283
 
-    print(label, values)
+    #print(label, values)
 
 
-Network = Network()
+
+#print(train_data[0].tolist())
+#785
+
+Network.add_layer(785)
+Network.add_layer(40)
+Network.add_layer(30)
+Network.add_layer(10)
+Network.initialize_weights()
+
+#Network.run(dict=[0,1,0,1,0,1,0,0])
+#Network.feed_forward()
+#Network.feed_forward()
+#inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
+#labels = [[0,1], [0,1]]
+
+inputs = [value.tolist() for value in train_data]
+
+labels = [label.tolist() for label in new_label_data_set]
+
+
+
+
+
+
+temp= Network.weights
+
+
+Network.run_epoch(inputs, labels)
+
+for i, x in zip(temp[0], Network.weights[0]):
+    print(i, x)

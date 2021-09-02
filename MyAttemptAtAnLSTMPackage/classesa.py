@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-class Network():
+class Network:
 
     def __init__(self):
         self.layers = []
@@ -216,7 +216,7 @@ class Network():
         self.weights = [np.add(weight_change_layer, weight_layer).tolist() for weight_change_layer, weight_layer in zip(Network.temp_weight_changes, Network.weights)]
 
 Network = Network()
-
+"""
 Network.add_layer(8)
 Network.add_layer(4)
 Network.add_layer(3)
@@ -230,7 +230,7 @@ inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
 labels = [[0,1], [0,1]]
 
 Network.run_epoch(inputs, labels)
-
+"""
 
 """
 temp_var = []

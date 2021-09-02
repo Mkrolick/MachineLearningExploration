@@ -15,7 +15,7 @@ class Network:
         self.values = []
         self.values_list = []
         self.nodes = 0
-        self.learning_rate = 0.1
+        self.learning_rate = 0.9
         self.error_signal_list = []
         self.temp_weight_changes = []
 

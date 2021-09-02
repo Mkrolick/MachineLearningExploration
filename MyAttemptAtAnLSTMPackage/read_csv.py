@@ -73,13 +73,12 @@ labels = [label.tolist() for label in new_label_data_set]
 
 
 
-
-
+huh = len(labels)
+print(labels)
 
 temp= Network.weights
 
 
 Network.run_epoch(inputs, labels)
-
-for i, x in zip(temp[0], Network.weights[0]):
-    print(i, x)
+for i in range(huh):
+    print(Network.predict(inputs[i]), labels[i])

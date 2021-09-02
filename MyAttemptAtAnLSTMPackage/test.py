@@ -27,3 +27,4 @@ print(np.array(summed_weights).flatten())
 
 
 """
+Network = Network()

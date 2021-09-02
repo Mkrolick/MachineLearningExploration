@@ -129,6 +129,7 @@ class Network():
             temp_list_errors_storage.append(temp_list_errors)
             temp_list_errors = []
         self.error_signal_list.append(temp_list_errors_storage)
+        self.temp_weight_changes.append([sum(x) for x in zip(*temp_list)])
         return [sum(x) for x in zip(*temp_list)]
 
     def generate_error_signal_hidden(self, current_layer = 0):
@@ -182,6 +183,7 @@ class Network():
         summed_weights = [[sum(zipped_elements) for zipped_elements in zip(*np_array[:,second_dimension_index])] \
                          for second_dimension_index in range(length_array)]
         flattened_weight_changes = np.array(summed_weights).flatten()
+        self.temp_weight_changes.append(flattened_weight_changes.tolist())
         return flattened_weight_changes.tolist()
 
 
@@ -196,20 +198,22 @@ class Network():
         print("Values :")
         print(self.values_list)
 
-    def run_epoch(self, inputs, labels, Network):
+    def run_epoch(self, inputs, labels):
         # Input in form [[1,1,0,1,0], [0,1,1,0,0], [0,1,1,1,0], ..., [0,1,1,1,0]]
         # Need to match input Layer
-        Network.generate_values(inputs = inputs)
+        self.generate_values(inputs = inputs)
         # Labels in form [[0,1], [1,0], ..., [0,1]]
         # Match Output Layer
-        Network.backprop_output(labels = labels)
+        self.backprop_output(labels = labels)
 
-        count_layers = Network.layers
+        count_layers = len(self.layers)
 
         for layer_index in range(count_layers - 2):
-            Network.generate_error_signal_hidden(current_layer=layer_index)
-            Network.backprop_hidden_layer(current_layer=layer_index)
+            self.generate_error_signal_hidden(current_layer=layer_index)
+            self.backprop_hidden_layer(current_layer=layer_index)
 
+        self.temp_weight_changes.reverse()
+        self.weights = [np.add(weight_change_layer, weight_layer).tolist() for weight_change_layer, weight_layer in zip(Network.temp_weight_changes, Network.weights)]
 
 Network = Network()
 
@@ -223,30 +227,19 @@ Network.initialize_weights()
 #Network.feed_forward()
 #Network.feed_forward()
 inputs = [[0,1,0,1,0,1,0,0], [0,0,0,1,0,1,0,1]]
+labels = [[0,1], [0,1]]
+
+Network.run_epoch(inputs, labels)
 
 
-Network.generate_values(inputs = [[0,0,0,0,1,1,1,1], [0,1,0,1,0,1,1,1]])
+"""
+temp_var = []
+for weight_change_layer, weight_layer in zip(Network.temp_weight_changes, Network.weights):
+    temp_var.append(np.add(weight_change_layer, weight_layer))
 
-#Network.stats()
-Network.backprop_output([[0,1], [0,1]])
-
-#print(Network.activation_func("Sigmoid", 0))
-Network.generate_error_signal_hidden()
-#print(Network. values_list)
-temp_ = Network.backprop_hidden_layer()
-print(temp_)
-
-# 2 -> 3 -> 4
+print([len(x) for x in temp_var])
 
 
-#print(temp_[0][0], temp_[1][0])
-Network.generate_error_signal_hidden(current_layer=1)
-#print(len(Network.backprop_hidden_layer(current_layer=1)[0]))
-#print(len(Network.backprop_hidden_layer(current_layer=1)[0]))
-#print(Network.error_signal_list[0])
-#print(Network.error_signal_list)
-#print(Network.error_signal_list)
-#print(len(Network.error_signal_list))
-#print(len(Network.weights))
-
-print([len(x) for x in Network.weights])
+print(Network.weights[2][0], Network.temp_weight_changes[2][0], temp_var[2][0], Network.temp_weight_changes[2][0] + Network.weights[2][0])
+print(temp_var[2][0] == Network.temp_weight_changes[2][0] + Network.weights[2][0])
+"""

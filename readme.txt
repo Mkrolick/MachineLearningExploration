@@ -45,3 +45,8 @@ Stochastic gradient Descent:
 
 
 LSTM -
+
+
+
+
+I haven't added to this in a while but I'll add it to microsoft todo for when I have time.
